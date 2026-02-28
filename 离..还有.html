@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>心跳刻度</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        :root { --accent: #6B7A8F; --bg: #F2F2F2; }
+        body { 
+            margin: 0; background: var(--bg); color: #333; 
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .card {
+            width: 85%; max-width: 350px; background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px); border-radius: 30px; padding: 40px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05); text-align: center;
+        }
+        .days-big {
+            font-size: 80px; font-weight: 200; letter-spacing: -2px; margin: 10px 0;
+        }
+        .title-input {
+            border: none; background: transparent; text-align: center;
+            font-size: 18px; color: #666; width: 100%; outline: none;
+        }
+        .date-picker {
+            margin-top: 30px; border: 1px solid #ddd; padding: 8px 15px;
+            border-radius: 20px; font-size: 14px; color: #888;
+        }
+        .btn-badge {
+            margin-top: 40px; background: var(--accent); color: white;
+            border: none; padding: 12px 30px; border-radius: 25px; font-size: 14px;
+        }
+        .support-link {
+            position: absolute; bottom: 40px; font-size: 12px; color: #bbb; text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <input type="text" class="title-input" id="title" value="距离 目标 还有" onclick="this.select()">
+        <div class="days-big" id="days-display">00</div>
+        <div style="font-size: 14px; color: #999; letter-spacing: 4px;">DAYS</div>
+        <input type="date" id="target-date" class="date-picker" onchange="calculate()">
+        <br>
+        <button class="btn-badge" onclick="requestBadge()">同步到桌面气泡</button>
+    </div>
+
+    <a href="javascript:void(0)" class="support-link" onclick="showCoffee()">☕ 给开发者喂杯咖啡</a>
+
+    <script>
+        // 初始化日期：默认为明年元旦
+        const nextYear = new Date().getFullYear() + 1;
+        document.getElementById('target-date').value = `${nextYear}-01-01`;
+
+        function calculate() {
+            const target = new Date(document.getElementById('target-date').value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const diff = target - today;
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('days-display').innerText = days > 0 ? days : 0;
+            return days > 0 ? days : 0;
+        }
+
+        // PWA Badge API 核心代码
+        async function requestBadge() {
+            const days = calculate();
+            
+            if ('setAppBadge' in navigator) {
+                try {
+                    await navigator.setAppBadge(days);
+                    alert("同步成功！请返回桌面查看图标数字。");
+                } catch (error) {
+                    console.error("Badge 失败", error);
+                }
+            } else {
+                alert("当前环境暂不支持气泡，请确保已“添加到主屏幕”使用。");
+            }
+        }
+
+        function showCoffee() {
+            // 这里放你之前准备的“打赏弹窗”代码
+            alert("这里是打赏逻辑：\n1. 弹出你的收款码\n2. 用户截图支付\n3. 感谢语");
+        }
+
+        calculate();
+    </script>
+</body>
+</html>
