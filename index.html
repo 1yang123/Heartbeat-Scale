@@ -70,19 +70,29 @@
 
         // PWA Badge API 核心代码
         async function requestBadge() {
-            const days = calculate();
-            
-            if ('setAppBadge' in navigator) {
-                try {
-                    await navigator.setAppBadge(days);
-                    alert("同步成功！请返回桌面查看图标数字。");
-                } catch (error) {
-                    console.error("Badge 失败", error);
-                }
-            } else {
-                alert("当前环境暂不支持气泡，请确保已“添加到主屏幕”使用。");
-            }
+    const days = calculate();
+    
+    // 1. 第一步：必须先请求通知权限
+    if (Notification.permission !== "granted") {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+            alert("请允许通知权限，否则无法显示桌面气泡哦！");
+            return;
         }
+    }
+
+    // 2. 第二步：执行设置气泡
+    if ('setAppBadge' in navigator) {
+        try {
+            await navigator.setAppBadge(days);
+            alert("同步成功！请返回桌面查看图标数字。");
+        } catch (error) {
+            console.error("Badge 失败", error);
+        }
+    } else {
+        alert("当前环境不支持。请确认：1. 已添加到主屏幕；2. iOS 版本已更新。");
+    }
+}
 
         function showCoffee() {
             // 这里放你之前准备的“打赏弹窗”代码
