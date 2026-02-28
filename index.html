@@ -100,6 +100,18 @@
         }
 
         calculate();
+
+        // 每次用户打开 App，不需要点按钮，悄悄更新一次数字
+window.addEventListener('load', async () => {
+    // 只有在桌面模式下才自动执行，避免在浏览器里报错
+    if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+        const days = calculate();
+        if ('setAppBadge' in navigator) {
+            await navigator.setAppBadge(days);
+            console.log("已自动更新今日进度");
+        }
+    }
+});
     </script>
 </body>
 </html>
